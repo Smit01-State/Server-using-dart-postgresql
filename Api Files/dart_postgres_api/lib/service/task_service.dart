@@ -8,4 +8,29 @@ class TaskService {
   Future<List<Task>> getTasks() async {
     return repository.getTasks();
   }
+
+  Future<Task> createTask({
+    required int userId,
+    required String title,
+    String? description,
+  }) async {
+    final nTitle = title.trim();
+
+    if (nTitle.isEmpty) {
+      throw ArgumentError('Task title cannot be empty');
+    }
+    if (nTitle.length > 255) {
+      throw ArgumentError('task can\'t exceed 255 charecters ');
+    }
+
+    final nDescription = description?.trim();
+
+    return repository.createTask(
+      userId: userId,
+      title: nTitle,
+      description: nDescription == null || nDescription.isEmpty
+          ? null
+          : nDescription,
+    );
+  }
 }

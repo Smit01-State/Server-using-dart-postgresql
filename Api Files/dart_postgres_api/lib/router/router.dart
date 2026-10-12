@@ -19,5 +19,7 @@ Router createRouter(Database database) {
   });
 
   router.get('/api/tasks', taskController.getTasks);
+  router.post('/api/tasks', taskController.createTask);
+
   return router;
 }

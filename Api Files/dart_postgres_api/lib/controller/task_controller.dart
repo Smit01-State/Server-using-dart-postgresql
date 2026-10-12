@@ -19,4 +19,53 @@ class TaskController {
       headers: {'content-type': 'application/json'},
     );
   }
+
+  Future<Response> createTask(Request request) async {
+    try {
+      final body = await request.readAsString();
+      final dynamic decode = jsonDecode(body);
+
+      if (decode is! Map<String, dynamic>) {
+        return _errorResponse(400, 'Request body must be a JSON object');
+      }
+      final userId = decode['user_id'];
+      final title = decode['title'];
+      final description = decode['description'];
+      if (title is! String) {
+        return _errorResponse(400, 'title is required and  must be String');
+      }
+      if (description is! String) {
+        return _errorResponse(
+          400,
+          'describtion is required and  must be String',
+        );
+      }
+
+      final task = await service.createTask(
+        userId: userId,
+        title: title,
+        description: description as String?,
+      );
+      return Response(
+        201,
+        body: jsonEncode(task.toMap()),
+        headers: {
+          'content-type': 'application/json',
+          'location': '/api/tasks/${task.id}',
+        },
+      );
+    } on FormatException {
+      return _errorResponse(400, 'invalid JSON');
+    } on ArgumentError catch (error) {
+      return _errorResponse(400, error.message.toString());
+    }
+  }
+
+  Response _errorResponse(int statusCode, String message) {
+    return Response(
+      statusCode,
+      body: jsonEncode({'error': message}),
+      headers: {'content-type': 'application/json'},
+    );
+  }
 }

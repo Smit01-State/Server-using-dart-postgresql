@@ -22,4 +22,24 @@ class TaskRepository {
       return Task.fromMap(row.toColumnMap());
     }).toList();
   }
+
+  Future<Task> createTask({
+    required int userId,
+    required String title,
+    String? description,
+  }) async {
+    final result = await db.execute(
+      Sql.named(''' 
+      INSERT INTO tasks (user_id,title,description)
+      VALUES (@user_id, @title , @description)
+      RETURNING *
+      '''),
+      parameters: {
+        'user_id': userId,
+        'title': title,
+        'description': description,
+      },
+    );
+    return Task.fromMap(result.first.toColumnMap());
+  }
 }
