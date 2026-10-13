@@ -23,6 +23,20 @@ class TaskRepository {
     }).toList();
   }
 
+  Future<Task?> getTaskById({required int id, required int userId}) async {
+    final result = await db.execute(
+      Sql.named('''
+        SELECT id , title, description, is_completed, created_at FROM tasks WHERE id = @id AND user_id = @userId
+      '''),
+      parameters: {'id': id, 'userId': userId},
+    );
+
+    if (result.isEmpty) {
+      return null;
+    }
+    return Task.fromMap(result.first.toColumnMap());
+  }
+
   Future<Task> createTask({
     required int userId,
     required String title,
@@ -43,17 +57,31 @@ class TaskRepository {
     return Task.fromMap(result.first.toColumnMap());
   }
 
-  Future<Task?> getTaskById({required int id, required int userId}) async {
+  Future<Task> updateTask({
+    required int id,
+    required String title,
+    String? description,
+    bool? isCompleted,
+  }) async {
     final result = await db.execute(
       Sql.named('''
-        SELECT id , title, description, is_completed, created_at FROM tasks WHERE id = @id AND user_id = @userId
+      UPDATE tasks
+      SET 
+      title = @title,
+      description = @description,
+      is_completed = @isCompleted
+      WHERE id = @id
+      RETURNING 
+      id , title , description , is_completed , created_at
       '''),
-      parameters: {'id': id, 'userId': userId},
+      parameters: {
+        'id': id,
+        'title': title,
+        'description': description,
+        'isCompleted': isCompleted,
+      },
     );
 
-    if (result.isEmpty) {
-      return null;
-    }
     return Task.fromMap(result.first.toColumnMap());
   }
 }

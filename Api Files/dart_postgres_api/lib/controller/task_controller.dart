@@ -30,6 +30,7 @@ class TaskController {
       final userId = decode['user_id'];
       final title = decode['title'];
       final description = decode['description'];
+
       if (title is! String) {
         return _errorResponse(400, 'title is required and  must be String');
       }
@@ -48,10 +49,7 @@ class TaskController {
       return Response(
         201,
         body: jsonEncode(task.toMap()),
-        headers: {
-          'content-type': 'application/json',
-          'location': '/api/tasks/${task.id}',
-        },
+        headers: {'content-type': 'application/json'},
       );
     } on FormatException {
       return _errorResponse(400, 'invalid JSON');
@@ -82,6 +80,50 @@ class TaskController {
           'content-type': 'application/json',
           'location': '/api/tasks/${task.id}',
         },
+      );
+    } on FormatException {
+      return _errorResponse(400, 'invalid JSON');
+    } on ArgumentError catch (error) {
+      return _errorResponse(400, error.message.toString());
+    }
+  }
+
+  Future<Response> updateTask(Request request) async {
+    try {
+      final body = await request.readAsString();
+      final dynamic decode = jsonDecode(body);
+
+      if (decode is! Map<String, dynamic>) {
+        return _errorResponse(400, 'Request body must be a JSON object');
+      }
+      print(decode['title']);
+      final id = decode['id'];
+      final title = decode['title'];
+      final description = decode['description'];
+      final isCompleted = decode['is_completed'];
+
+      print('title is ${title.runtimeType}');
+
+      if (title is! String) {
+        return _errorResponse(400, 'title is required and  must be String');
+      }
+      if (description is! String) {
+        return _errorResponse(
+          400,
+          'describtion is required and  must be String',
+        );
+      }
+      final task = await service.updateTask(
+        id: id,
+        title: title,
+        description: description,
+        isCompleted: isCompleted,
+      );
+
+      return Response(
+        201,
+        body: jsonEncode(task.toMap()),
+        headers: {'content-type': 'application/json'},
       );
     } on FormatException {
       return _errorResponse(400, 'invalid JSON');

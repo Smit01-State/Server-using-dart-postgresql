@@ -40,4 +40,35 @@ class TaskService {
     }
     return repository.getTaskById(id: id, userId: userId);
   }
+
+  Future<Task> updateTask({
+    required int id,
+    required String title,
+    String? description,
+    bool? isCompleted,
+  }) async {
+    if (id <= 0) {
+      throw FormatException('id can\'t be zero || nagative ..');
+    }
+
+    final nTitle = title.trim();
+
+    if (nTitle.isEmpty) {
+      throw ArgumentError('Task title cannot be empty');
+    }
+    if (nTitle.length > 255) {
+      throw ArgumentError('task can\'t exceed 255 charecters ');
+    }
+
+    final nDescription = description?.trim();
+
+    return repository.updateTask(
+      id: id,
+      title: title,
+      description: nDescription == null || nDescription.isEmpty
+          ? null
+          : nDescription,
+      isCompleted: isCompleted,
+    );
+  }
 }
