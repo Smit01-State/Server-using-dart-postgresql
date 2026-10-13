@@ -20,6 +20,7 @@ Router createRouter(Database database) {
 
   router.get('/api/tasks', taskController.getTasks);
   router.post('/api/tasks', taskController.createTask);
+  router.get('/api/tasks/id', taskController.getTaskById);
 
   return router;
 }

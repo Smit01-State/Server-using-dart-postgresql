@@ -33,4 +33,11 @@ class TaskService {
           : nDescription,
     );
   }
+
+  Future<Task?> getTaskById({required int id, required int userId}) async {
+    if (id <= 0 && userId <= 0) {
+      throw ArgumentError('id and user_id must be greater than zero');
+    }
+    return repository.getTaskById(id: id, userId: userId);
+  }
 }

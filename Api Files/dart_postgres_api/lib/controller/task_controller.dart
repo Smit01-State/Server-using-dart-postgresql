@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:dart_postgres_api/service/task_service.dart';
 import 'package:shelf/shelf.dart';
 
@@ -49,6 +48,36 @@ class TaskController {
       return Response(
         201,
         body: jsonEncode(task.toMap()),
+        headers: {
+          'content-type': 'application/json',
+          'location': '/api/tasks/${task.id}',
+        },
+      );
+    } on FormatException {
+      return _errorResponse(400, 'invalid JSON');
+    } on ArgumentError catch (error) {
+      return _errorResponse(400, error.message.toString());
+    }
+  }
+
+  Future<Response> getTaskById(Request request) async {
+    try {
+      final body = await request.readAsString();
+      final decode = jsonDecode(body);
+
+      if (decode is! Map<String, dynamic>) {
+        return _errorResponse(400, 'Request body must be a JSON object');
+      }
+      final id = decode['id'];
+      final userId = decode['user_id'];
+
+      if (userId is! int && id is! int) {
+        return _errorResponse(400, 'user_id and id must be integer value ');
+      }
+      final task = await service.getTaskById(id: id, userId: userId);
+      return Response(
+        201,
+        body: jsonEncode(task!.toMap()),
         headers: {
           'content-type': 'application/json',
           'location': '/api/tasks/${task.id}',

@@ -42,4 +42,18 @@ class TaskRepository {
     );
     return Task.fromMap(result.first.toColumnMap());
   }
+
+  Future<Task?> getTaskById({required int id, required int userId}) async {
+    final result = await db.execute(
+      Sql.named('''
+        SELECT id , title, description, is_completed, created_at FROM tasks WHERE id = @id AND user_id = @userId
+      '''),
+      parameters: {'id': id, 'userId': userId},
+    );
+
+    if (result.isEmpty) {
+      return null;
+    }
+    return Task.fromMap(result.first.toColumnMap());
+  }
 }
