@@ -48,7 +48,7 @@ class TaskService {
     bool? isCompleted,
   }) async {
     if (id <= 0) {
-      throw FormatException('id can\'t be zero || nagative ..');
+      throw ArgumentError('id can\'t be zero || nagative ..');
     }
 
     final nTitle = title.trim();
@@ -70,5 +70,12 @@ class TaskService {
           : nDescription,
       isCompleted: isCompleted,
     );
+  }
+
+  Future<bool> deleteTask(int id) async {
+    if (id <= 0) {
+      throw ArgumentError('id can\'t be zero || nagative ..');
+    }
+    return repository.deleteTask(id);
   }
 }

@@ -21,7 +21,8 @@ Router createRouter(Database database) {
   router.get('/api/tasks', taskController.getTasks);
   router.post('/api/tasks', taskController.createTask);
   router.get('/api/tasks/:id', taskController.getTaskById);
-  router.put('/api/tasks/id', taskController.updateTask);
+  router.put('/api/tasks/:id', taskController.updateTask);
+  router.delete('/api/tasks/:id', taskController.deleteTask);
 
   return router;
 }

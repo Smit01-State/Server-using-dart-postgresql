@@ -26,7 +26,7 @@ class TaskRepository {
   Future<Task?> getTaskById({required int id, required int userId}) async {
     final result = await db.execute(
       Sql.named('''
-        SELECT id , title, description, is_completed, created_at FROM tasks WHERE id = @id AND user_id = @userId
+        SELECT id, title, description, is_completed, created_at FROM tasks WHERE id = @id AND user_id = @userId
       '''),
       parameters: {'id': id, 'userId': userId},
     );
@@ -83,5 +83,16 @@ class TaskRepository {
     );
 
     return Task.fromMap(result.first.toColumnMap());
+  }
+
+  Future<bool> deleteTask(int id) async {
+    final result = await db.execute(
+      Sql.named('''
+        DELETE FROM tasks WHERE id = @id
+        RETURNING id
+    '''),
+      parameters: {'id': id},
+    );
+    return result.isNotEmpty;
   }
 }

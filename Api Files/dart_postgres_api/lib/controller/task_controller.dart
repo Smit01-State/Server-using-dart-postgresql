@@ -132,6 +132,27 @@ class TaskController {
     }
   }
 
+  Future<Response> deleteTask(Request request) async {
+    try {
+      final body = await request.readAsString();
+      final dynamic decode = jsonDecode(body);
+
+      if (decode is! Map<String, dynamic>) {
+        return _errorResponse(400, 'Request body must be a JSON object');
+      }
+      final id = decode['id'];
+      final isDeleted = await service.deleteTask(id);
+
+      if (!isDeleted) {
+        return _errorResponse(404, 'task not found');
+      }
+
+      return Response(204);
+    } on ArgumentError catch (error) {
+      return _errorResponse(400, error.message.toString());
+    }
+  }
+
   Response _errorResponse(int statusCode, String message) {
     return Response(
       statusCode,
